@@ -12,12 +12,6 @@ from .processor import Processor, Operator
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s",
-    handlers=[logging.StreamHandler(sys.stderr)],
-)
-
 
 def parse_operator(name: str, operator: Operator) -> Operator:
     """
@@ -52,6 +46,13 @@ def parse_operator(name: str, operator: Operator) -> Operator:
 
 def main():
     """ The main function to run the module when not used as a library """
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s",
+        handlers=[logging.StreamHandler(sys.stderr)],
+    )
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "source_wb", help="filename of the source excel workbook", type=Path
@@ -62,7 +63,22 @@ def main():
         help="optional config filename, otherwise source_wb.json is used.",
         type=Path,
     )
+    parser.add_argument(
+        "-d",
+        "--debug",
+        help="optional debug argument. Set debug message level.",
+        type=str,
+    )
     args = parser.parse_args()
+
+    # Set debug level from argument. Default to WARNING
+    if args.debug:
+        if "debug" == args.debug.lower():
+            logging.getLogger().setLevel(logging.DEBUG)
+        elif "info" == args.debug.lower():
+            logging.getLogger().setLevel(logging.INFO)
+        else:
+            raise Exception("-d debugging option not valid")
 
     # If a config file is not specified use the workbook stem + .toml
     if not args.config:
