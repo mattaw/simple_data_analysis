@@ -69,6 +69,39 @@ class Matcher(Operator):
         return (self.name, output)
 
 
+class Filter(Operator):
+    """ Filter invokes operators if no matches occur inside its list
+    """
+
+    def __init__(self, name: str, matches: list):
+        self.matches = matches
+        self.operators = []
+        self.name = name
+
+    def add_operator(self, operator: Operator):
+        self.operators.append(operator)
+
+    def run(self, data):
+        match = True
+        if self.matches:
+            for label, value in self.matches:
+                if data[label] != value:
+                    match = False
+                    break
+        if match:
+            logger.debug("Filter '%s' '%s' hit.", self.name, self.matches)
+            return
+
+        for operator in self.operators:
+            operator.run(data)
+
+    def output(self):
+        output = {}
+        for name, operator in self.operators:
+            output[name] = operator.output()
+        return (self.name, output)
+
+
 class Grouper(Operator):
     """ Matcher performs and AND match on its list, then invokes operators
     """
