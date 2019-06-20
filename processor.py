@@ -64,8 +64,9 @@ class Matcher(Operator):
 
     def output(self):
         output = {}
-        for name, operator in self.operators:
-            output[name] = operator.output()
+        for operator in self.operators:
+            name, result = operator.output()
+            output[name] = result
         return (self.name, output)
 
 
@@ -97,8 +98,9 @@ class Filter(Operator):
 
     def output(self):
         output = {}
-        for name, operator in self.operators:
-            output[name] = operator.output()
+        for operator in self.operators:
+            name, result = operator.output()
+            output[name] = result
         return (self.name, output)
 
 
@@ -131,8 +133,9 @@ class Grouper(Operator):
         output = {}
         for name, group in self.groups.items():
             output[name] = {}
-            for item_name, item in group:
-                output[name][item_name] = item
+            for operator in group:
+                group_name, result = operator.output()
+                output[name][group_name] = result
         return (self.name, output)
 
 

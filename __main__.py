@@ -102,7 +102,9 @@ def main():
         proc.add_operator(parse_operator(name, operator))
 
     proc.start()
-    print(proc.operators[1].output())
+    import pprint
+
+    pprint.pprint(proc.output())
 
 
 main()
